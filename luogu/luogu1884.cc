@@ -26,17 +26,16 @@ void build(int left,int right,int now){
     build(mid+1,right,now*2+1);
 }
 void insert(int left,int right,int type,int now){
-    if(T[now].left == left && T[now].right == right){
-        printf("%d %d\n",T[now].left,T[now].right);
+    if(T[now].left == left && T[now].right == right && T[now].covers != -1){
         if(type == 0){
             T[now].covers ++;
             if(T[now].covers ==1){
-                lens += __y[T[now].right] - __y[T[now].left];
+                lens += __y[T[now].right+1] - __y[T[now].left];
             }
         }else{
             T[now].covers --;
             if(T[now].covers == 0){
-                lens -= __y[T[now].right] - __y[T[now].left];
+                lens -= __y[T[now].right+1] - __y[T[now].left];
             }
         }
         return;
@@ -54,7 +53,7 @@ void insert(int left,int right,int type,int now){
         insert(left,mid,type,now*2);
         insert(mid+1,right,type,now*2+1);
     }
-    if(T[now*2].covers == T[now*2].covers){
+    if(T[now*2].covers == T[now*2+1].covers){
         T[now].covers = T[now*2].covers;
     }else{
         T[now].covers = -1;
@@ -81,17 +80,15 @@ int main(){
         edges[i].y1 = lower_bound(__y,__y+k,edges[i].y1) - __y;
         edges[i].y2 = lower_bound(__y,__y+k,edges[i].y2) - __y;
     }
-    build(0,k,1);
+    build(0,k-1,1);
     lens = 0;
-    printf("%d %d\n",__y[edges[0].y1],__y[edges[0].y2]);
-    insert(edges[0].y1,edges[0].y2,edges[0].type,1);
-    printf("%d\n",lens);
+    insert(edges[0].y1,edges[0].y2-1,edges[0].type,1);
     int prevX = edges[0].x;
     long long ans=0;
     for(int i=1;i<2*n;++i){
-        ans += lens * (edges[i].x - prevX);
+        ans += (long long)lens * (edges[i].x - prevX);
         prevX = edges[i].x;
-        insert(edges[i].y1,edges[i].y2,edges[i].type,1);
+        insert(edges[i].y1,edges[i].y2-1,edges[i].type,1);
     }
     printf("%lld\n",ans);
     return 0;
